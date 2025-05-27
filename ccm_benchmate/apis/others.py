@@ -149,7 +149,9 @@ class BioGrid:
         if evidence_types is not None:
             params["includeEvidence"]=True
 
-        url = f"https://webservice.thebiogrid.org/interactions?{params}"
+        query_string = "&".join(f"{key}={value}" for key, value in params.items())
+        url = f"https://webservice.thebiogrid.org/interactions?{query_string}"
+        print(url)
         response = requests.get(url)
         if response.status_code == 200:
             data = response.json()
@@ -166,7 +168,7 @@ class BioGrid:
         Get the evidence types from BioGrid.
         :return: A list of evidence types.
         """
-        url = f"https://webservice.thebiogrid.org/evidenceTypes?accessKey={self.access_key}"
+        url = f"https://webservice.thebiogrid.org/evidence?accessKey={self.access_key}"
         response = requests.get(url)
         if response.status_code == 200:
             return response.content.decode().split("\n")
@@ -190,7 +192,7 @@ class BioGrid:
         Get the supported identifiers from BioGrid.
         :return: A list of supported identifiers.
         """
-        url = f"https://webservice.thebiogrid.org/supportedIdentifiers?accessKey={self.access_key}"
+        url = f"https://webservice.thebiogrid.org/identifiers?accessKey={self.access_key}"
         response = requests.get(url)
         if response.status_code == 200:
             return response.content.decode().split("\n")

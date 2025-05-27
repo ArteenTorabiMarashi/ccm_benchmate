@@ -62,7 +62,9 @@ overlap = ensembl.overlap(grange, features)
 xrefs = ensembl.xrefs("ENSG00000139618")
 
 # Mapping
-mapping = ensembl.mapping("ENSP00000288602", 100, 300)
+mapping_cdna = ensembl.mapping("ENST00000288602", 100, 300) 
+
+mapping_protein = ensembl.mapping("ENSP00000288602", 100, 300, type = "protein")
 
 # Info
 info = ensembl.info()
@@ -77,9 +79,9 @@ Client for the UniProt API. Retrieves protein information, mutagenesis data, iso
 
 **Usage Examples:**
 ```python
-from ccm_benchmate.apis.uniprot import Uniprot
+from ccm_benchmate.apis.uniprot import UniProt
 
-uniprot = Uniprot()
+uniprot = UniProt()
 
 # Get protein info
 protein_info = uniprot.get_protein("P38398")

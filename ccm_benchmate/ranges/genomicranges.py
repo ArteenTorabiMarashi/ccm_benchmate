@@ -6,6 +6,8 @@ class GenomicRange:
     def __init__(self, chrom, start, end, strand, annotation=None):
         self.chrom = chrom
         self.strand = strand
+        self.start = start
+        self.end = end
         self.ranges = Range(start, end)
         self.annotation = annotation
 

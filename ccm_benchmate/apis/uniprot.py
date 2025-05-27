@@ -34,7 +34,7 @@ class UniProt:
         This function gathers data from the UniProt API using the provided uniprot_id.
         :return: whole json response from the API
         """
-        url = self.urls["base_response"].format(uniprot_id)
+        url = self.url["base_response"].format(uniprot_id)
         response = requests.get(url, headers=self.headers)
         content = warn_for_status(response, "issues with gathering data")
         if content is not None:

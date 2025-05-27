@@ -4,7 +4,7 @@ import pandas as pd
 import requests
 import json
 
-from ccm_demo.ranges.genomicranges import GenomicRange
+from ccm_benchmate.ranges.genomicranges import GenomicRange
 
 #I'm skipping the genome stuff because we have the genome class that will get the genome build the db etc.
 # this is also the whole point of genomic ranges classes, that we can do these calculations locally, I do not think
@@ -97,7 +97,7 @@ class Ensembl:
         if not isinstance(grange, GenomicRange):
             raise ValueError("grange must be a GenomicRange object")
 
-        ext= f"/phenotype/region/{species}/{grange.chrom}/{grange.start}-{grange.end}"
+        ext= f"/phenotype/region/{species}/{grange.chrom}:{grange.start}-{grange.end}"
         response = requests.get(f"{self.base_url}{ext}", headers=self.headers)
         response.raise_for_status()
         decoded = json.loads(response.text)
@@ -125,7 +125,7 @@ class Ensembl:
         if sequence_type not in types:
             raise ValueError("sequence_type must be one of ['genomic', 'cds', 'protein', 'cdna']")
 
-        ext=f"{ext};type={sequence_type};multiple_sequences=1"
+        ext=f"{ext}?type={sequence_type};multiple_sequences=1"
         response = requests.get(f"{self.base_url}{ext}", headers=self.headers)
         response.raise_for_status()
         decoded = pd.DataFrame(response.json())
@@ -138,7 +138,7 @@ class Ensembl:
         :param id: ensembl id, because the ids also specify the species you do not need to specify the species
         :return: a dict of cross references these can be used to get the ids from other databases from other apis
         """
-        ext = f"/xrefs/id/?{id}"
+        ext = f"/xrefs/id/{id}"
         response = requests.get(f"{self.base_url}{ext}", headers=self.headers)
         response.raise_for_status()
         decoded=pd.DataFrame(response.json())
@@ -154,11 +154,11 @@ class Ensembl:
         :return: dict of mapping information, this not really compatible with genomicranges that's why the inputs are different
         """
         if type == "cDNA":
-            ext = f"/mapping/cdns/{id/start}..{end}"
+            ext = f"/map/cdna/{id}/{start}..{end}"
         elif type == "CDS":
-            ext = f"/mapping/cds/{id/start}..{id/end}"
+            ext = f"/map/cds/{id}/{start}..{end}"
         elif type == "protein":
-            ext = f"/mapping/translate/{id/start}..{id/end}"
+            ext = f"/map/translation/{id}/{start}..{end}"
         else:
             raise ValueError("type must be one of ['cDNA', 'CDS', 'protein']")
 
@@ -185,16 +185,18 @@ class Ensembl:
                 if feature not in available_features:
                     warnings.warn(f"Feature {feature} not available")
                     continue
-                else:
-                    features.append(feature)
-
+                    # The else statement here was an infinite loop
 
         if not isinstance(grange, GenomicRange):
             raise ValueError("grange must be a GenomicRange object")
 
-        initial_ext = f"/overlap/region/{species}/{grange.chrom}/{grange.start}-{grange.end}"
+        # I believe this is what you were going for (all the features appended to same request) - Arteen
+        initial_ext = f"/overlap/region/{species}/{grange.chrom}:{grange.start}-{grange.end}"
+        feature_ext = f""
         for feature in features:
-            ext = f"{initial_ext};feature={feature}"
+            feature_ext = f"{feature_ext};feature={feature}"
+        
+        ext = f"{initial_ext}?{feature_ext}" #Technically starts request with ?; but it seems to work
 
         response = requests.get(f"{self.base_url}{ext}", headers=self.headers)
         response.raise_for_status()
