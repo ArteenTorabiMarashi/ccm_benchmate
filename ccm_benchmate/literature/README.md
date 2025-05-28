@@ -15,7 +15,7 @@ The `LitSearch` class provides methods to search PubMed and arXiv databases.
 ### Usage
 
 ```python
-from ccm_demo.literature.literature import LitSearch
+from ccm_benchmate.literature.literature import LitSearch
 
 # Initialize searcher (optional PubMed API key)
 searcher = LitSearch(pubmed_api_key="your_api_key")  # API key optional
@@ -32,13 +32,15 @@ pubmed_ids = searcher.search(
 dois = searcher.search(
     query="BRCA1 breast cancer", 
     database="pubmed",
-    results="doi"     # Return DOIs instead of PMIDs
+    results="doi",     # Return DOIs instead of PMIDs
+    max_results=1000
 )
 
 # Search arXiv
 arxiv_ids = searcher.search(
     query="machine learning genomics",
-    database="arxiv"
+    database="arxiv",
+    max_results=1000
 )
 ```
 
@@ -49,7 +51,7 @@ The `Paper` class handles downloading and processing individual papers.
 ### Usage
 
 ```python
-from ccm_demo.literature.literature import Paper
+from ccm_benchmate.literature.literature import Paper
 
 # Initialize from PubMed ID
 paper = Paper(

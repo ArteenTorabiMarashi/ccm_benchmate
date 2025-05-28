@@ -3,7 +3,7 @@ import warnings
 
 from bs4 import BeautifulSoup as bs
 
-from ccm_demo.literature.utils import *
+from ccm_benchmate.literature.utils import *
 
 class NoPapersError(Exception):
     pass
@@ -48,7 +48,7 @@ class LitSearch:
                 to_ret=ids
 
         elif database == "arxiv":
-            search_url="http://export.arxiv.org/api/search_query?{}&max_results={}".format(query, str(max_results))
+            search_url="http://export.arxiv.org/api/query?search_query=all:{}&max_results={}".format(query, str(max_results))
             search_response = requests.get(search_url)
             search_response.raise_for_status()
             soup = bs(search_response.text, "xml")
