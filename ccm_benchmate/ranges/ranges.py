@@ -27,7 +27,8 @@ class Range:
         self._range = pd.Interval(new_start, new_end, closed='both')
         return self
 
-    def overlaps(self, other, type="exact"):
+    # Changing default to "any", as that is genomicranges default behaviour
+    def overlaps(self, other, type="any"):
         assert(isinstance(other, Range))
         overlap_types=["exact", "within", "start", "end", "any"]
         if type not in overlap_types:
@@ -53,6 +54,21 @@ class Range:
         else:
             return min(abs(self.start - other.start), abs(self.end - other.end),
                        abs(self.start - other.end), abs(self.end - other.start))
+
+    def merge(self, other):
+        """
+        Merge two range objects
+        :param self: first range object
+        :param other: second range object
+        :return: first range object with updated start and end
+        """
+        new_start = min(self.start, other.start)
+        new_end = max(self.end, other.end)
+        self._check_values(new_start, new_end)
+        self.start = new_start
+        self.end = new_end
+        self._range = pd.Interval(self.start, self.end, closed='both')
+        return self
 
     def split(self, n):
         """

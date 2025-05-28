@@ -29,7 +29,7 @@ print(len(r1))            # 11
 print(r1.overlaps(r2))    # True
 print(r1.distance(r2))    # 0 (overlapping)
 print(r1.merge(r2))       # Range(10, 25)
-print(r1.split(n))    # split into 2 equal parts return a RangesList: [Range(10, 15), Range(15, 20)]
+print(r1.split(2))    # split into 2 equal parts return a RangesList: [Range(10, 15), Range(15, 20)]
 ```
 
 ---
@@ -49,7 +49,7 @@ for r in ranges:
     print(r)
 
 # Calculate coverage: number of ranges covering each position from min(start) to max(end)
-coverage = ranges.coverage()  # e.g., [1, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1]
+coverage = ranges.coverage()  # e.g., [1, 1, 2, 2, 2, 1, 1, 0, 0, 1, 1, 1]
 ```
 Additional operations include: pop, append, extend, remove, find_overlaps, as well as some basic list operations like len, index, contains
 string, and iterating, seting, and getting items and in/equality checks. Reduce method is also available to reduce the list of ranges to a single range.
@@ -63,9 +63,8 @@ A dictionary-like container mapping keys (e.g., names, categories) to `RangesLis
 ```python
 from ccm_benchmate.ranges.ranges import RangesDict, Range, RangesList
 
-rdict = RangesDict()
-rdict["A"] = RangesList([Range(1, 10), Range(15, 20)])
-rdict["B"] = RangesList([Range(5, 12)])
+rdict = RangesDict(keys = ["A", "B"],
+                   values = [RangesList([Range(1, 10), Range(15, 20)]), RangesList([Range(5, 12)])])
 
 # Access ranges for a key
 print(rdict["A"])  # RangesList([Range(1, 10), Range(15, 20)])
