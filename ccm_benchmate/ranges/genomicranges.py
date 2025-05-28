@@ -263,12 +263,16 @@ class GenomicRangesList:
 
 
 class GenomicRangesDict(dict):
-    def __init__(self, keys, values):
+    def __init__(self, keys=None, values=None):    
         super().__init__()
-        for key, value in zip(keys, values):
-            assert(isinstance(key, str))
-            assert(isinstance(value, GenomicRangesList) or isinstance(value, GenomicRange))
-            self[key] = value
+        
+        if keys is not None and values is not None:
+            for key, value in zip(keys, values):
+                assert(isinstance(key, str))
+                assert(isinstance(value, GenomicRangesList) or isinstance(value, GenomicRange))
+                self[key] = value
+
+
 
     def find_overlaps(self, other=None, type="exact", ignore_strand=False):
         if other is None:
@@ -287,7 +291,7 @@ class GenomicRangesDict(dict):
 
     def __setitem__(self, key, value):
         assert (isinstance(key, str))
-        assert (isinstance(value, GenomicRangesDict) or isinstance(value, GenomicRange))
+        assert (isinstance(value, GenomicRangesDict) or isinstance(value, GenomicRange) or isinstance(value, GenomicRangesList))
         super().__setitem__(key, value)
 
     def __delitem__(self, key):

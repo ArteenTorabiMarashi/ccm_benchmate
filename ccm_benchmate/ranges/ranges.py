@@ -248,12 +248,14 @@ class RangesList:
 
 
 class RangesDict(dict):
-    def __init__(self, keys, values):
+    def __init__(self, keys=None, values=None):
         super().__init__()
-        for key, value in zip(keys, values):
-            assert(isinstance(key, str))
-            assert(isinstance(value, RangesList) or isinstance(value, Range))
-            self[key] = value
+
+        if keys is not None and values is not None:
+            for key, value in zip(keys, values):
+                assert(isinstance(key, str))
+                assert(isinstance(value, RangesList) or isinstance(value, Range))
+                self[key] = value
 
     def find_overlaps(self, other=None, type="exact"):
         if other is None:
