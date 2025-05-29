@@ -55,24 +55,24 @@ from ccm_benchmate.literature.literature import Paper
 
 # Initialize from PubMed ID
 paper = Paper(
-    paper_id="12345678",
+    paper_id="34518686",
     id_type="pubmed",
     citations=True,      # Get citation data
     references=True,     # Get reference data
     related_works=True   # Get related papers
 )
 
-# Initialize from arXiv ID 
-paper = Paper(
-    paper_id="2101.12345",
-    id_type="arxiv"
-)
+<openalex appear to have arxiv support>
+<Initialize from arXiv ID>
+<paper = Paper(>
+<paper_id="2101.12345",>
+<id_type="arxiv")>
 
-# Initialize from local PDF file
-paper = Paper(
-    paper_id=None,
-    filepath="/path/to/paper.pdf"
-)
+<Missing lp config file, and I dont know what it needs for it>
+<# Initialize from local PDF file>
+<paper = Paper(>
+<paper_id=None,>
+<filepath="/path/to/paper.pdf")>
 
 # Get paper abstract
 abstract = paper.get_abstract()

@@ -76,7 +76,8 @@ class Paper:
         self.figures = None
         self.text = None
         if paper_id is None and filepath is not None:
-            self.file_paths=filepath
+            self.file_path=filepath
+            self.process=self.process()
         else:
             self.id_type=id_type
             self.id=paper_id
