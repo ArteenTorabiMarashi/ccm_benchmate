@@ -59,7 +59,8 @@ class ContainerRunner:
         for host_path in host_paths:
             if not os.path.exists(host_path):
                 raise ContainerError(f"Host path does not exist: {host_path}")
-        self.bind_mounts[host_paths] = container_path
+        for host_path in host_paths:
+            self.bind_mounts[host_path] = container_path
 
     def enable_gpu(self) -> None:
         """Enable NVIDIA GPU support for the container."""
@@ -75,7 +76,7 @@ class ContainerRunner:
         Returns:
             List of command components
         """
-        cmd = [self.Container_cmd, "run"]
+        cmd = [self.Container_cmd, "exec"]
 
         if self.use_gpu:
             cmd.append("--nv")
@@ -170,7 +171,7 @@ class ContainerRunner:
 
         sbatch_script += """
     # Load Container/Singularity module
-    module load singularity
+    module load Singularity
 
     # Run the Container command
     {0}

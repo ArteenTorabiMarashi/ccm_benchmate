@@ -18,4 +18,6 @@ TMPDIR=/projects/dir/pip_cache pip install -r requirements_step1.txt
 
 module load gcc/9.5.0
 TMPDIR=/projects/dir/pip_cache pip install -r requirements_step2.txt
+
+# Note, if planning on using containers through singularity, ensure you have run module load Singularity prior to launching python
 ```

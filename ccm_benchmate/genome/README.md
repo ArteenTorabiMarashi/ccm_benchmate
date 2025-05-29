@@ -16,7 +16,7 @@ The `Genome` class provides methods to:
 ### Initializing a Genome Object
 
 ```python
-from ccm_demo.genome.genome import Genome
+from ccm_benchmate.genome.genome import Genome
 
 # Create a genome object with required files
 genome = Genome(
