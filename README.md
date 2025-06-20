@@ -4,17 +4,17 @@
 
 # CCM Benchmate package:
 
-This package aims to provide an integration setup for different biological from different sources and formats. There are
+This package aims to provide an integrative setup from different biological sources and formats. There are
  several modules that are designed to work together to allow researchers to combine data from public databases, papers 
 as well as their own data. 
 
 To get started please see [installation instructions](INSTALLATION.md).
 
-Each of the modules are designed to work independently from one another with few exceptions (see variant and ranges modules 
+Each of the modules are designed to work independently from one another with a few exceptions (see variant and ranges modules 
 and how they are used in the apis and genome module). Each module has its own README file that provides usage instructions and 
 how they can be integrated together. 
 
-This package is a work in progress and is not yet ready for production use, that said, quite a few of the modules can be 
+This package is a work in progress and is not yet ready for production use. However, quite a few of the modules can be 
 used to get started, and they can be used to build custom pipelines for data integration. Below is a brief overview of the
 modules that are currently available in the package:
 
@@ -30,7 +30,7 @@ isoforms and mutagenesis endpoints. These are then integrated into a single dict
 of the ncbi databases, including nucleotide sequences, protein sequences, gene annotations, and more. While you can search pubmed
 using this module, the literature module is better suited for that purpose (see below). 
 + ensembl.org: This is a database of genomic sequences and annotations. The module provides a way to search for gene variants
-mapping between different coordinates systems, and more. The module also provides a way to search for genes and their annotations,
+mapping between different coordinate systems, and more. The module also provides a way to search for genes and their annotations,
 annotate variants, query cross references from different databases and more. 
 + stringdb.org: This is a database of protein-protein interactions. The module provides a way to search for protein-protein interactions. 
 Additionally you can use the biogrid and IntAct endpoints under others to perform similar queries.
@@ -47,42 +47,42 @@ database is downloaded ahead of time in a read-only folder.
 ## Literature module:
 
 This module provides a way to search for scientific literature. It is designed to work with the NCBI PubMed and ARXIV databases.
-You can search for articles and using free text queries as well as retriving specific articles by their identifiers. The latter is 
+You can search for articles and use free text queries as well as retriving specific articles by their identifiers. The latter is 
 useful for retrieving articles that you already know about or more importantly are mentioned in the data you have retrieved using the 
 apis modules. 
 
 Articles titles and abstracts are returned as from pubmed and arxiv searches (pubmed already archives medarxiv and bioarxiv articles).
-Additionally you can search for open acceess articles using openalex.org and retrieve their full text pdf files for download. 
+Additionally you can search for open access articles using openalex.org and retrieve their full text pdf files for download. 
 
 These downloaded pdf (as well as any other local pdf that you already have) can be processed to extract the text, figures, tables from the 
 downloaded documents. Using semantich chunking methods (sepearing the text into sections that convey similar topics) the text can further be
-processed. Figures and tables can be automaticall interpreted using a vision language model (default is QWEN-7.5B-VL). These interpretations 
+processed. Figures and tables can be automatically interpreted using a vision language model (default is QWEN-7.5B-VL). These interpretations 
 are similarly processed to the full text data. All of this can be permanantly stored in a database for later retrieval and analysis 
 (more on that later, see knowledge_base module). 
 
 ## Container Runner module:
 
-This is a module that would allow you to run any conteinerized application on your local machine or on a remote server. To give you the most
-flexible way to incoporate your data into you database we have created a container runner class that can be used to run any singularity/apptainer
+This is a module that would allow you to run any conteinerized application on your local machine or on a remote server. To give the most
+flexible way to incoporate your data into you database, we have created a container runner class that can be used to run any singularity/apptainer
 containter either locally or on HPC. We also have a to_container script that can be used to convert conda environments into singularity/appatiner
 contianers. 
 
-We are working on creating a small libarry of exisiting containers that can be immediately used to process your data. These will be available 
-soon in our own docker container registry. You can then use these docker containers to create a singluarity/apptainer .sif file to run arbitrary packages and pipelines. You can run these packages and commands either in an interactive session or submit them as slurmm jobs in HPC. Please see the container runner module readme for usage instructions. 
+We are working on creating a small library of exisiting containers that can be immediately used to process your data. These will be available 
+soon in our own docker container registry. You can then use these docker containers to create a singluarity/apptainer .sif file to run arbitrary packages and pipelines. You can run these packages and commands either in an interactive session or submit them as slurm jobs on HPC. Please see the container runner module readme for usage instructions. 
 
 Keep in mind that if you want to integrate the outputs of these containers/pipelines it's up to you to make sure that they are compatible with the modules in this package. 
 
 ## Databases Module
 
-Currently this is empty, the goal is to gather information and requests from the general community to create either a standalone database with a query schema or just a collection of read-only file where users can search for their data on their own. Once this is done we will also release the files and their respective contents available here that are under hpc. Additionally we will provide a download script to create the same folder/database structure as well as instructions to how to regularly update the files as new versions of databases become available. 
+Currently this is empty, the goal is to gather information and requests from the general community to create either a standalone database with a query schema or just a collection of read-only file where users can search for their data on their own. Once this is done we will also release the files and their respective contents here that are under HPC. Additionally we will provide a download script to create the same folder/database structure as well as instructions to how to regularly update the files as new versions of databases become available. 
 
 ## Genome Module
 
-While it is possible to use the ensembl api class to query genomic ranges and intervals for instances where you are interested in only one genome (and its annotatoins) for the whole project and you will need to make repeated queries it would be more performant (and nicer to ther people using the ensembl api) to generate a data structure that can represent genomic/proteomic information. 
+While it is possible to use the ensembl api class to query genomic ranges and intervals for instances where you are making repeated queries for only one genome (and its annotations) within a single project, it would be more performant (and nicer to ther people using the ensembl api) to generate a data structure that can represent genomic/proteomic information. 
 
-This is were the genom module comes into play. The genome.genome.Genome class takes a genome fasta file and a gtf fjile and creates a database of genomic regions. These regions can then be queried by genes, transcripts, exons, cdss, introns and utrs depending on the avalibility of these annotation types in the gtf file. You can also extract sequences from the genome fasta file for any arbitrary genome interval (see Ranges and GenomicRanges below) as well as providing (or generating) transcritome and proteome fasta files. 
+This is were the genome module comes into play. The genome.genome.Genome class takes a genome fasta file and a gtf file and creates a database of genomic regions. These regions can then be queried by genes, transcripts, exons, cds, introns and utrs depending on the avalibility of these annotation types in the gtf file. You can also extract sequences from the genome fasta file for any arbitrary genome interval (see Ranges and GenomicRanges below) as well as providing (or generating) transcriptome and proteome fasta files. 
 
-The genome module also suspports saving these results to an arbitrary database, whether this is your knowledge base or any other kind of SQL databse (could even be in-memory sqlite). Each genome instance can be created and stored independently so if your analysis/project requires multiple genomes (or multiple annotations of the same fasta file, these are treated as different genomes). There is also support for that. 
+The genome module also supports saving these results to an arbitrary database, whether this is your knowledge base or any other kind of SQL databse (could even be in-memory sqlite). Each genome instance can be created and stored independently so if your analysis/project requires multiple genomes (or multiple annotations of the same fasta file, these are treated as different genomes), there is also support for that. 
 
 Finally for your own work you can add arbitrary annotations to each of the tables in `JSON` format and then query them later. 
 
@@ -90,7 +90,7 @@ Finally for your own work you can add arbitrary annotations to each of the table
 
 This module is there to represent biological sequences. There are a few methods (more to come, please create an issue if you'd like to see specific things). 
 
-The base `Sequence` class can take 4 different kinds of sequences (DNA, RNA, protein and [3di](https://github.com/steineggerlab/foldseek)) and store arbitary properties and annoations in the features property. You can read/write these to fasta files, run blast searches using NCBI's blast api calculate msas using mmseqs (this will be moved to containers module and will call that container by default in the future) and calculate embeddings using several different AI models likek ESM2/3 or nucleotide transformer (more will come, please create an issue if you would like to see more models). 
+The base `Sequence` class can take 4 different kinds of sequences (DNA, RNA, protein and [3di](https://github.com/steineggerlab/foldseek)) and store arbitary properties and annotations in the features property. You can read/write these to fasta files, run blast searches using NCBI's blast api, calculate msas using mmseqs (this will be moved to containers module and will call that container by default in the future) and calculate embeddings using several different AI models likek ESM2/3 or nucleotide transformer (more will come, please create an issue if you would like to see more models). 
 
 For collections of sequences there are 2 other class types, `SequenceList` and `SequenceDict`, as the name suggests there are `list` and `dict`  like instances and contain many other methods that list and dictionaries have. Please see the sequence module readme for more information and usage instructions. 
 
@@ -102,7 +102,7 @@ The base `Structure` class can take a pbd file and load its structure. It can ex
 
 There is also a `StructureComplex` instance and as the name suggests this is there to represent complexes. These can be multiple proteins, or a protein+ligand, DNA/RNA/Protein complexes. Similar to the `Structure` instance we are working on creating `ContainerRunner` calls to predict arbitrary structure complexes using AlphaFold2/3 and Boltz1/2. 
 
-Additionally we are working on creating a `Simulation` class to sample protein structure fluctiations either via [Openmm](https://openmm.org/) (very computationally intensive, but accurate and time resolved), [BioEmu](https://github.com/microsoft/bioemu) and [AlphaFlow](https://github.com/bjing2016/alphaflow). These again will be calls to `ContainerRunner` calls, which means if you have other calculations that will utilize these containers for arbitrary outputs. 
+Additionally we are working on creating a `Simulation` class to sample protein structure fluctuations either via [Openmm](https://openmm.org/) (very computationally intensive, but accurate and time resolved), [BioEmu](https://github.com/microsoft/bioemu) and [AlphaFlow](https://github.com/bjing2016/alphaflow). These again will be calls to `ContainerRunner` calls, which means if you have other calculations that will utilize these containers for arbitrary outputs. 
 
 ## Variant Module
 
