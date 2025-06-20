@@ -98,7 +98,7 @@ For collections of sequences there are 2 other class types, `SequenceList` and `
 
 Similar to sequence module, the main goal is to store sequences and related information as well as some basic calculations related to biological structures. 
 
-The base `Structure` class can take a pbd file and load its structure. It can extract the sequence of the structure, calculate embeddings using ESM3, calculate solvent accesible surface area, get its 3Di sequence (see above), align it to another `Structure` instance and write to results to a pdb file. Still under construction, you can also predict a structure using one of (OmegaFold, Alphafold2, AlphaFold3-you need to get your own weights due to licensing requirements, Boltz1 and Boltz2). These will be calls to the `ContainerRunner` module and results will be saved to disk. 
+The base `Structure` class can take a pbd file and load its structure. It can extract the sequence of the structure, calculate embeddings using ESM3, calculate solvent accessible surface area, get its 3Di sequence (see above), align it to another `Structure` instance and write to results to a pdb file. Still under construction, you can also predict a structure using one of (OmegaFold, Alphafold2, AlphaFold3-you need to get your own weights due to licensing requirements, Boltz1 and Boltz2). These will be calls to the `ContainerRunner` module and results will be saved to disk. 
 
 There is also a `StructureComplex` instance and as the name suggests this is there to represent complexes. These can be multiple proteins, or a protein+ligand, DNA/RNA/Protein complexes. Similar to the `Structure` instance we are working on creating `ContainerRunner` calls to predict arbitrary structure complexes using AlphaFold2/3 and Boltz1/2. 
 
@@ -106,26 +106,25 @@ Additionally we are working on creating a `Simulation` class to sample protein s
 
 ## Variant Module
 
-As the name suggests, this is module to representing variants. These can range from simple snps/indels to large structural variations and tandem repeat expansions. These variants take some basic required information for their representations. You can create genomic HGVS notations from these variatns which would make them compatible with some of the enpoints in ensembl module. If there are other vairtion types that we have missed please create an issue and describe how that variant is represented. Before doing so please look at the code in variant.variant file to get ian idea about how we are approaching this problem. 
+As the name suggests, this is a module to representing variants. These can range from simple snps/indels to large structural variations and tandem repeat expansions. These variants take some basic required information for their representations. You can create genomic HGVS notations from these variatns which would make them compatible with some of the enpoints in ensembl module. If there are other vairtion types that we have missed please create an issue and describe how that variant is represented. Before doing so please look at the code in variant.variant file to get an idea about how we are approaching this problem. 
 
 ## Ranges Module
 
-These module contains to main classes, `Ranges` moduel along with its counterparts `RangesList` and `RangesDict` are for storing arbitrary ranges. These can be any integer based ranges (that's the current limitation). Once you have a few ranges you can calculate the distance between them, you can merge them, calculate overlaps between 2 ranges. 
+These module contains to main classes, `Ranges` moduel along with its counterparts `RangesList` and `RangesDict` are for storing arbitrary ranges. These can be any integer based ranges (that's the current limitation). Once you have a few ranges, you can calculate the distance between them, merge them, and calculate overlaps between 2 ranges. 
 
 All these operations are also supported in `GenomicRanges` instances as well. It also requires strand and chromosome information for more biologically relevant calculations. These modules can be used on their own for perfoming pythonic operations similar to R's `GenomicFeatures` package. They are also being heavily used by the `genome.genome.Genome` class for querying, and some of the endpoints in the `apis.ensembl.Ensembl` instance. Please see the specific readme under the ranges module for usage instructions. 
 
 ## Knowledge Base
 
 This module is designed to store the results of your searches and queries in a database. The goal is to provide a way to store the data that you have retrieved from the different modules in a structured way that allows you to query it later. The database schema
-is still under heavy development. Currenlty we have schemas to store the paper classses, sequences, structures, variants and genomes. Due to semantic chunking and processing of the paper text there is a strict requiremen to use postgres as the database. This allows us
+is still under heavy development. Currenlty we have schemas to store the paper classses, sequences, structures, variants and genomes. Due to semantic chunking and processing of the paper text there is a strict requirement to use postgres as the database. This allows us
 to offload a lot of the semantic searching via pgvector extension. Unfortunately this means that you will need to install pgvector extension on your postgres database. We will be providing instructions how to do that under the knowledge base module readme.
 
-One of the most ambitions goals of this module it to provide a natural language search capabilities to many different data modalities that are represented in by othe other modules. This means that you will be able to search for papers, sequences, 
+One of the most ambitions goals of this module it to provide a natural language search capabilities to many different data modalities that are represented by other modules. This means that you will be able to search for papers, sequences, 
 structures, variants and genomes using natural language queries. The results will be returned in a structured way that allows you to easily access the data. This great flexilbilitly however comes at cost of requiring a gpu to run a language modeld that will 
-perform the queyring for you. We are currently working on a few different modeld that can be used for this purpose and will be providing a unified interface to use either your local models served via `llama.cpp` or `ollama` or remote models served via `huggingface.co` or
+perform the queyring for you. We are currently working on a few different models that can be used for this purpose and will be providing a unified interface to use either your local models served via `llama.cpp` or `ollama` or remote models served via `huggingface.co` or
 closed source models like `openai.com`. The goal of this project is not to provide an interface for analysis but rather to provide a way to store and query the data that you have retrieved from the different modules in a structured way that hopefully will 
-allow you to generate hypoteses to test and analyze. This means that we will **not** be providing any analysis pipelines or tools otherthan simple `ContainerRunner` calls to run your own pipelines and we will not be supporiting any kind of security or 
-will data privacy. This is a research project and we are not responsible for any data that you store in the knowledge base.
+allow you to generate hypotheses to test and analyze. This means that we will **not** be providing any analysis pipelines or tools other than simple `ContainerRunner` calls to run your own pipelines and we will not be supporiting any kind of security or data privacy. This is a research project and we are not responsible for any data that you store in the knowledge base.
 
 ### Storing your searches/results
 
@@ -149,7 +148,7 @@ queries to be scripted more easily.
 + **More Documentation**: We are working on adding more documentation to the package. Once we have a more functional package we will create a deatailed documentation for each module and how they can be used together both interactively and in a pipeline.
 + **More Tests**: We are working on adding more tests to the package. This is an urgent requirement that we could use help with. If you have experience using `pytest` and would like to help us write tests please create a pull request. 
 + **More Examples**: We are working on adding more examples to the package. If you have suggestions for examples that you would like to see please create an issue on the GitHub repository and we will try to add them.
-+ **More Containers**: We are working on adding more containers to the package. Once we have a series of containers that can be used to process your data will create instructions as to how to pull them and use them as either Docker or Singularity/Apptainer containers.
++ **More Containers**: We are working on adding more containers to the package. Once we have a series of containers that can be used to process your data, we will create instructions as to how to pull them and use them as either Docker or Singularity/Apptainer containers.
 
 ### Contributing
 
@@ -165,14 +164,14 @@ know if you find this package useful and if you have any suggestions for improve
 ### Issues
 
 If you find any bugs or have suggestions for improvements please create an issue on the GitHub repository. We will try to address them as soon as possible.
-Additionaly feel free to fork this repository and create a pull request with your changes. We are always looking for help with improving thie package and integrating as many 
+Additionaly feel free to fork this repository and create a pull request with your changes. We are always looking for help with improving this package and integrating as many 
 data sources and modalitites as possible.
 
 ### Contact us
 
 The best way to contact us is via github issues, you can create an issue about problems you are facing or features, datasets, containers you would like to have. 
-If you have container/code pipeline etc. That you think others could use, you can create a module for it and create a pull request or make changes to one of the existing modules. 
-Please see [CONTRIBUTING.md](CONTRIBUTING.md) for how to do that and basic reccomendations about our (very relaxed) code standards. 
+If you have container/code pipeline etc., that you think others could use, you can create a module for it and create a pull request or make changes to one of the existing modules. 
+Please see [CONTRIBUTING.md](CONTRIBUTING.md) for how to do that and basic recomendations about our (very relaxed) code standards. 
 
 
 
