@@ -1,5 +1,6 @@
 import os.path
 import time
+import tempfile
 
 from dataclasses import dataclass
 from typing import Optional
@@ -138,6 +139,7 @@ class PaperInfo:
     references: Optional[list] = None
     related_works: Optional[list] = None
     cited_by: Optional[list] = None
+    pmc_id: Optional[str] = None
 
 class Paper:
     def __init__(self, paper_id, id_type="pubmed", get_abstract=True):
@@ -185,6 +187,15 @@ class Paper:
                                             "affiliation": None})
             else:
                 authors=None
+            article_id_list=soup.find("ArticleIdList")
+            if article_id_list is not None:
+                pmc_tag=article_id_list.find("ArticleId", IdType="pmc")
+                if pmc_tag is not None:
+                    pmc_tag=pmc_tag.text
+            else:
+                pmc_tag=None
+            self.info.pmc_id=pmc_tag
+
 
         elif self.info.id_type == "arxiv":
             response = requests.get("http://export.arxiv.org/api/query?search_query=id:{}".format(self.info.id))
@@ -213,9 +224,25 @@ class Paper:
 
     def search_info(self):
         """
+        Check if pmc id is available, if so build download link from that
         search openalex for the paper info and download link
         :return: fill in the paper info openalex_info and download_link
         """
+        if self.info.pmc_id is not None:
+            response = requests.get("https://www.ncbi.nlm.nih.gov/pmc/utils/oa/oa.fcgi?id={}".format(self.info.pmc_id))
+            response.raise_for_status()
+            soup=bs(response.text, "xml")
+            check_error = soup.find("error")
+            if check_error is not None:
+                warnings.warn("There is no place to download the paper, this paper might not be open access")
+                download_link = None
+            else:
+                link = soup.find("link", format="tgz")["href"]
+                if link is not None:
+                    download_link = link.replace("ftp://", "https://", 1)
+            self.info.download_link=download_link
+            return None
+
         openalex_info = search_openalex(id_type=self.info.id_type, paper_id=self.info.id)
         if openalex_info is None:
             warnings.warn("Could not find a paper with id {}".format(self.info.id))
@@ -243,16 +270,56 @@ class Paper:
         :param destination: where to download the paper, it must exist, the folder will not be created or checked for existence
         :return: download the paper pdf to the destination folder
         """
+        if self.info.download_link.endswith(".tar.gz"): # can skip a request call if we download tar here
+            file_path=os.path.abspath(os.path.join("{}/{}.tar.gz".format(destination, self.info.id)))
+            
+            with tempfile.NamedTemporaryFile(suffix=".tar.gz") as tmp_file:
+                self.download_tar(tmp_file.name, destination)
+                download_paths = extract_pdfs_from_tar(tmp_file.name, destination)
+
+            
+            if len(download_paths) > 1:
+                main_paper_path=min(download_paths, key=lambda p: len(os.path.splitext(os.path.basename(p))[0]))
+            else:
+                main_paper_path=download_paths
+            self.info.downloaded=True
+            self.info.file_path=main_paper_path
+            return None
+
         download = requests.get(self.info.download_link, stream=True)
         download.raise_for_status()
         if download.headers.get("Content-Type", "").lower() == "application/pdf":
             with open("{}/{}.pdf".format(destination, self.info.id), "wb") as f:
                 f.write(download.content)
             file_path=os.path.abspath(os.path.join("{}/{}.pdf".format(destination, self.info.id)))
+            self.info.downloaded=True
             self.info.file_path=file_path
         else:
             warnings.warn("Could not download the paper, this paper might not be open access or the link might not point to a pdf file")
         return None
+
+    def download_tar(self, file, destination):
+        """
+        download the pmc tar file to destination file
+        :param destination: path to directory where papers live, it must exist, the folder with not be created
+        :return: download tar file to destination folder with name being self.id
+        """
+        response=requests.get(self.info.download_link, stream=True)
+        response.raise_for_status()
+
+        if response.status_code==200: #check get response, is there an error from server side is the link correct
+            try:
+                with open(file, "wb") as f:
+                    for chunk in response.iter_content(chunk_size=8192): #1MB chunk downloads
+                        f.write(chunk)
+                return None
+            except Exception as e:
+                raise RuntimeError('Could not download tar file: {}'.format(e)) from e
+        else:
+            return response.raise_for_status()
+
+
+
 
     def get_references(self):
         """

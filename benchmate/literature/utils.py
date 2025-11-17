@@ -32,7 +32,7 @@ def extract_pdfs_from_tar(file, destination):
             for member in tar.getmembers():
                 if member.name.endswith("pdf"):
                     tar.extract(member, destination)
-                    paths.append(os.path.abspath(os.path.join(destination, file, member.name)))
+                    paths.append(os.path.abspath(os.path.join(destination, member.name)))
 
         return paths
 
