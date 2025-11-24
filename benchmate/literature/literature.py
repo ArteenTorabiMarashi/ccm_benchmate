@@ -237,28 +237,28 @@ class Paper:
                 warnings.warn("There is no place to download the paper, this paper might not be open access")
                 download_link = None
             else:
-                link = soup.find("link", format="tgz")["href"]
-                if link is not None:
-                    download_link = link.replace("ftp://", "https://", 1)
-            self.info.download_link=download_link
-            return None
+                pmc_link = soup.find("link", format="tgz")["href"]
+                if pmc_link is not None:
+                    download_link = pmc_link.replace("ftp://", "https://", 1)
 
         openalex_info = search_openalex(id_type=self.info.id_type, paper_id=self.info.id)
-        if openalex_info is None:
-            warnings.warn("Could not find a paper with id {}".format(self.info.id))
 
-        else:
-            if "best_oa_location" in openalex_info.keys() and openalex_info[
-                "best_oa_location"] is not None:
-                link = openalex_info["best_oa_location"]["pdf_url"]
-                if link is not None and link.endswith(".pdf"):
-                    download_link = openalex_info["best_oa_location"]["pdf_url"]
-                else:
-                    warnings.warn("Did not find a direct pdf download link")
-                    download_link = None
+        if download_link is None:
+            if openalex_info is None:
+                warnings.warn("Could not find a paper with id {}".format(self.info.id))
+
             else:
-                warnings.warn("There is no place to download the paper, this paper might not be open access")
-                download_link = None
+                if "best_oa_location" in openalex_info.keys() and openalex_info[
+                    "best_oa_location"] is not None:
+                    link = openalex_info["best_oa_location"]["pdf_url"]
+                    if link is not None and link.endswith(".pdf"):
+                        download_link = openalex_info["best_oa_location"]["pdf_url"]
+                    else:
+                        warnings.warn("Did not find a direct pdf download link")
+                        download_link = None
+                else:
+                    warnings.warn("There is no place to download the paper, this paper might not be open access")
+                    download_link = None
 
         self.info.openalex_info=openalex_info
         self.info.download_link=download_link
@@ -270,14 +270,11 @@ class Paper:
         :param destination: where to download the paper, it must exist, the folder will not be created or checked for existence
         :return: download the paper pdf to the destination folder
         """
-        if self.info.download_link.endswith(".tar.gz"): # can skip a request call if we download tar here
-            file_path=os.path.abspath(os.path.join("{}/{}.tar.gz".format(destination, self.info.id)))
-            
-            with tempfile.NamedTemporaryFile(suffix=".tar.gz") as tmp_file:
-                self.download_tar(tmp_file.name, destination)
-                download_paths = extract_pdfs_from_tar(tmp_file.name, destination)
+        if self.info.download_link.endswith(".tar.gz"):
+            tmp_file=tempfile.NamedTemporaryFile(suffix=".tar.gz")
+            download_tar(self.info.download_link, tmp_file.name) # downloads into tempfile location
+            download_paths=extract_pdfs_from_tar(tmp_file.name, destination) # extracts pdf into destination location
 
-            
             if len(download_paths) > 1:
                 main_paper_path=min(download_paths, key=lambda p: len(os.path.splitext(os.path.basename(p))[0]))
             else:
@@ -297,28 +294,6 @@ class Paper:
         else:
             warnings.warn("Could not download the paper, this paper might not be open access or the link might not point to a pdf file")
         return None
-
-    def download_tar(self, file, destination):
-        """
-        download the pmc tar file to destination file
-        :param destination: path to directory where papers live, it must exist, the folder with not be created
-        :return: download tar file to destination folder with name being self.id
-        """
-        response=requests.get(self.info.download_link, stream=True)
-        response.raise_for_status()
-
-        if response.status_code==200: #check get response, is there an error from server side is the link correct
-            try:
-                with open(file, "wb") as f:
-                    for chunk in response.iter_content(chunk_size=8192): #1MB chunk downloads
-                        f.write(chunk)
-                return None
-            except Exception as e:
-                raise RuntimeError('Could not download tar file: {}'.format(e)) from e
-        else:
-            return response.raise_for_status()
-
-
 
 
     def get_references(self):
